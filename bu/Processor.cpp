@@ -417,6 +417,11 @@ void Processor::flushCompressed(pdal::PointTableRef table, pdal::PointViewPtr vi
     wopts.add("scale_x", m_b.scale[0]);
     wopts.add("scale_y", m_b.scale[1]);
     wopts.add("scale_z", m_b.scale[2]);
+
+    // We need to user LAS 1.2 for compatibility with older software.
+    wopts.add("minor_version", 2);
+    wopts.add("dataformat_id", 3);
+
     w->setOptions(wopts);
     w->setInput(*prev);
     // Set dataformat ID based on time/rgb, but for now accept the default.
