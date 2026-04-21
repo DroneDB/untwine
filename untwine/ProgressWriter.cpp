@@ -86,6 +86,14 @@ void ProgressWriter::update(PointCount count)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
 
+    // Guard against an unset or zero threshold (can happen with very small point clouds)
+    // to avoid integer division-by-zero raising SIGFPE on worker threads.
+    if (m_threshold == 0)
+    {
+        m_current += count;
+        return;
+    }
+
     PointCount inc = m_current / m_threshold;
     m_current += count;
     PointCount postInc = m_current / m_threshold;

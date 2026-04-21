@@ -102,7 +102,10 @@ void Epf::run(const Options& options, ProgressWriter& progress)
     std::sort(fileInfos.begin(), fileInfos.end(), [](const FileInfo& f1, const FileInfo& f2)
         { return f1.numPoints > f2.numPoints; });
 
-    progress.m_threshold = progress.m_total / 40;
+    // Avoid division-by-zero in ProgressWriter::update() when the total point count is
+    // smaller than the divisor (e.g. tiny test datasets). An unsigned zero threshold would
+    // trigger EXCEPTION_INT_DIVIDE_BY_ZERO on Windows inside worker threads.
+    progress.m_threshold = (std::max)(progress.m_total / 40, PointCount(1));
     progress.setIncrement(.01);
     progress.m_current = 0;
 
